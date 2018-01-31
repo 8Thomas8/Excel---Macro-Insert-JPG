@@ -1,0 +1,24 @@
+﻿Public Sub insere_image() 'Nom de la macro
+    On Error Resume Next
+    For Each o In Selection 'Pour toute la selection
+    o.Activate
+    Z = o.Offset(0, -1) & ".jpg" 'Nom de la photo = nom dans la case précedente + . jpg
+    ficimg = ThisWorkbook.Path & "\" & Z 'Chemin de la photo = dossier du cocument\nom de l'image.jpg
+    ActiveSheet.Pictures.Insert(ficimg).Select ' insertion
+    
+    
+   With Selection.ShapeRange
+       .LockAspectRatio = True        ' Proportions d'origine lorsque vous la redimensionnez
+       .Top = ActiveCell.Top           ' Haut de la cellule
+       .Left = ActiveCell.Left         ' Gauche de la cellule
+       .Height = ActiveCell.Height  ' Hauteur de l'image en fonction de celle de la cellule
+       .IncrementLeft (ActiveCell.Width - .Width) / 2 'Centre l'image dans la cellule dans la largeur
+       .IncrementTop (ActiveCell.Height - .Height) / 2 'Centre l'image dans la cellule en hauteur
+   End With
+   
+    With Selection
+        .PrintObject = True             ' l'objet est imprimé en même temps que le document
+       .Placement = xlMoveAndSize      ' manière dont l'objet est lié aux cellules
+   End With
+    Next
+End Sub
