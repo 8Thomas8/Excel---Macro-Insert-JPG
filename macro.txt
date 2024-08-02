@@ -1,24 +1,42 @@
-﻿Public Sub insere_image() 'Nom de la macro
-    On Error Resume Next
-    For Each o In Selection 'Pour toute la selection
-    o.Activate
-    Z = o.Offset(0, -1) & ".jpg" 'Nom de la photo = nom dans la case précedente + . jpg
-    ficimg = ThisWorkbook.Path & "\" & Z 'Chemin de la photo = dossier du cocument\nom de l'image.jpg
-    ActiveSheet.Pictures.Insert(ficimg).Select ' insertion
-    
-    
-   With Selection.ShapeRange
-       .LockAspectRatio = True        ' Proportions d'origine lorsque vous la redimensionnez
-       .Top = ActiveCell.Top           ' Haut de la cellule
-       .Left = ActiveCell.Left         ' Gauche de la cellule
-       .Height = ActiveCell.Height  ' Hauteur de l'image en fonction de celle de la cellule
-       .IncrementLeft (ActiveCell.Width - .Width) / 2 'Centre l'image dans la cellule dans la largeur
-       .IncrementTop (ActiveCell.Height - .Height) / 2 'Centre l'image dans la cellule en hauteur
-   End With
-   
-    With Selection
-        .PrintObject = True             ' l'objet est imprimé en même temps que le document
-       .Placement = xlMoveAndSize      ' manière dont l'objet est lié aux cellules
-   End With
-    Next
+Public Sub InsertImage()
+    Dim cell As Range
+    Dim imageName As String
+    Dim imagePath As String
+    Dim img As Picture
+
+    On Error GoTo ErrorHandler
+
+    For Each cell In Selection
+        ' Définir le nom et le chemin de l'image
+        imageName = cell.Offset(0, -1).Value & ".jpg"
+        imagePath = ThisWorkbook.Path & "\" & imageName
+
+        ' Vérifier si le fichier image existe
+        If Dir(imagePath) <> "" Then
+            ' Insérer l'image
+            Set img = ActiveSheet.Pictures.Insert(imagePath)
+            img.Select
+
+            With Selection.ShapeRange
+                .LockAspectRatio = msoTrue
+                .Top = cell.Top
+                .Left = cell.Left
+                .Height = cell.Height
+                .IncrementLeft (cell.Width - .Width) / 2
+                .IncrementTop (cell.Height - .Height) / 2
+            End With
+
+            With Selection
+                .PrintObject = True
+                .Placement = xlMoveAndSize
+            End With
+        Else
+            MsgBox "Le fichier " & imagePath & " n'existe pas.", vbExclamation
+        End If
+    Next cell
+
+    Exit Sub
+
+ErrorHandler:
+    MsgBox "Une erreur est survenue: " & Err.Description, vbCritical
 End Sub
